@@ -49,7 +49,7 @@ var obj = {
   }
 };
 
-var fn = obj.getFn;
+var fn = obj.getFn();
 alert(fn()); // "Cute object"
 
 // *** Precompiler features ***

@@ -386,6 +386,10 @@ var ExtraCompiler = construct({
       ind = code.indexOf("(", ind);
       var end = code.indexOf(")", ind), data = code.slice(ind + 1, end), val = "", isVal = false;
       
+      if (data.indexOf(" in ") === -1 && data.indexOf(" of ") === -1) {
+        data = data.replace(cursor, "");
+      }
+      
       if (data.indexOf(" in ") !== -1) {
         data = data.split(" in ");
         
