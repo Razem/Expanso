@@ -32,7 +32,7 @@ var LiteralParser = construct({
             var end = @findNext(ch, min + 1, true);
             
             if (end === -1) {
-              throw @error(min);
+              @error(min);
             }
             
             ind = min + @putId("string-" + (ch === '"' ? "double" : "single"), min, end);
@@ -59,7 +59,7 @@ var LiteralParser = construct({
               var end = @findNext("*/", min + 2);
               
               if (end === -1) {
-                throw @error(min);
+                @error(min);
               }
               
               ind = min + @putId("comment-block", min, end + 1);

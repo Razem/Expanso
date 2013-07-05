@@ -31,7 +31,7 @@ var LiteralParser = construct({
             var end = this.findNext(ch, min + 1, true);
             
             if (end === -1) {
-              throw this.error(min);
+              this.error(min);
             }
             
             ind = min + this.putId("string-" + (ch === '"' ? "double" : "single"), min, end);
@@ -58,7 +58,7 @@ var LiteralParser = construct({
               var end = this.findNext("*/", min + 2);
               
               if (end === -1) {
-                throw this.error(min);
+                this.error(min);
               }
               
               ind = min + this.putId("comment-block", min, end + 1);
