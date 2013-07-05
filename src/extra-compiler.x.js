@@ -305,9 +305,14 @@ var ExtraCompiler = construct({
             code = code.slice(0, start) + ExtraCompiler.superInit + code.slice(ind);
           }
           else if (code[ind] === ".") {
-            var brInd = code.indexOf("(", ind), name = code.slice(ind + 1, brInd);
+            var brInd = code.indexOf("(", ind), name = code.slice(ind + 1, brInd), fnCall = ExtraCompiler.superCall(name);
             
-            code = code.slice(0, start) + ExtraCompiler.superCall(name) + code.slice(brInd + 1);
+            var brEnd = @skipWhitespace(code, brInd + 1);
+            if (code[brEnd] === ")") {
+              fnCall = fnCall.replace(/,\s*$/, "");
+            }
+            
+            code = code.slice(0, start) + fnCall + code.slice(brInd + 1);
           }
           else {
             code = code.slice(0, start) + ExtraCompiler.superConstructor + code.slice(ind);
