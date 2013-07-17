@@ -52,6 +52,18 @@ var obj = {
 var fn = obj.getFn();
 alert(fn()); // "Cute object"
 
+// Multi-line strings and a string interpolation
+// (The indentation - in this case 10 spaces - is cleared on every line)
+var str = `
+          <div class="article">
+            <div class="author">#{author}</div>
+            #{@content}
+          </div>
+          `;
+
+// Better regular expressions (in development)
+var rgx = #/some data/g;
+
 // *** Precompiler features ***
 
 // Modules (CommonJS, AMD), export
