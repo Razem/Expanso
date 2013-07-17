@@ -3,7 +3,7 @@
   construct = "legio/oop/construct" = Legio.construct
 )
 
-var whitespace = /\s|\u0011|\u0012/, cursor = /\u0011|\u0012/g;
+var whitespace = #/\s|\u0011|\u0012/, cursor = #/\u0011|\u0012/g;
 
 var LiteralParser = construct({
   init: code -> {
@@ -13,7 +13,7 @@ var LiteralParser = construct({
   
   members: {
     parse: () -> {
-      var code = @code, ind = 0, symbols = ['"', "'", "/"];
+      var code = @code, ind = 0, symbols = ['"', "'", "`", "/"];
       
       MAIN:
       while (true) {
@@ -28,14 +28,14 @@ var LiteralParser = construct({
         }
         
         if (Number.isFinite(min)) {
-          if (ch === '"' || ch == "'") {
+          if (ch === '"' || ch === "'" || ch === "`") {
             var end = @findNext(ch, min + 1, true);
             
             if (end === -1) {
               @error(min);
             }
             
-            ind = min + @putId("string-" + (ch === '"' ? "double" : "single"), min, end);
+            ind = min + @putId("string-" + (ch === "`" ? "expanso" : (ch === '"' ? "double" : "single")), min, end);
             code = @code;
           }
           else if (ch === "/") {
@@ -66,7 +66,7 @@ var LiteralParser = construct({
               code = @code;
             }
             else {
-              var notBefore = /\)|\]|\w|\$/;
+              var notBefore = #/\)|\]|\w|\$/;
               for (var j = 1; min - j >= 0; ++j) {
                 var c = @get(min - j);
                 if (whitespace.test(c)) {
@@ -87,12 +87,22 @@ var LiteralParser = construct({
                 @error(min);
               }
               
-              var flags = /^(g|i|m)/;
+              var flags = #/^(g|i|m)/;
               while (flags.test(@get(end + 1))) {
                 ++end;
               }
               
-              ind = min + @putId("regexp", min, end);
+              var type = "regexp";
+              if (@get(min - 1) === "#") {
+                type += "-expanso";
+                min -= 1;
+              }
+              else if (cursor.test(@get(min - 1)) && @get(min - 2) === "#") {
+                type += "-expanso";
+                min -= 2;
+              }
+              
+              ind = min + @putId(type, min, end);
               code = @code;
             }
           }
@@ -106,12 +116,13 @@ var LiteralParser = construct({
     },
     
     restore: (code = @code) -> {
-      var lits = @literals,
-          out = "", lastIndex = 0;
+      var
+      lits = @literals,
+      out = "", lastIndex = 0;
       
       while (true) {
         var mainInd = Infinity, ind, j, id;
-        for (var i = 0; i < lits.length; ++i) {
+        #foreach (i of lits) {
           id = "'" + i + '"', ind = code.indexOf(id, lastIndex);
           
           if (ind !== -1 && ind < mainInd) {
@@ -181,6 +192,23 @@ var LiteralParser = construct({
       var
       code = @code,
       lit = code.slice(start, end),
+      id;
+      
+      if (type === "regexp-expanso") {
+        lit = lit.slice(1);
+      }
+      else if (type === "string-expanso") {
+        lit = lit.slice(1, -1).replace(cursor, "").replace(#/\\`/g, "`");
+        
+        var len = start - code.lastIndexOf("\n", start) - 1, indent = new RegExp("^( ){" + len + "}", "gm");
+        lit = lit.replace(indent, "").trim();
+        
+        lit = JSON.stringify(lit);
+        
+        var ch = lit[0];
+        lit = lit.replace(#/#\{@((\w|\$)+)\}/g, ch + " + this.$1 + " + ch).replace(#/#\{((\w|\$)+)\}/g, ch + " + $1 + " + ch);
+      }
+      
       id = "'" + (@literals.push({ type: type, data: lit }) - 1) + '"';
       
       @code = code.slice(0, start) + id + code.slice(end);

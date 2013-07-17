@@ -4,7 +4,7 @@
   LiteralParser = "./literal-parser" = LiteralParser
 )
 
-var whitespace = /\s|\u0011|\u0012/, cursor = /\u0011|\u0012/g, alnum = /^(\w|[\$@\u0011\u0012])$/;
+var whitespace = #/\s|\u0011|\u0012/, cursor = #/\u0011|\u0012/g, alnum = #/^(\w|[\$@\u0011\u0012])$/;
 
 var ExtraCompiler = construct({
   init: code -> {
@@ -31,7 +31,7 @@ var ExtraCompiler = construct({
       code = @compileLambdas(code);
       
       // The "this" shortcut
-      code = code.replace(/@(\u0011|\u0012)?(\w|\$)/g, "this.$1$2").replace(/@/g, "this");
+      code = code.replace(#/@(\u0011|\u0012)?(\w|\$)/g, "this.$1$2").replace(#/@/g, "this");
       
       // Precompiler expressions
       code = @compileSharp(code);
@@ -43,7 +43,7 @@ var ExtraCompiler = construct({
     },
     
     compileLambdas: code -> {
-      var arrow = /[^-]->|[^=]=>/g, lastIndex = 0, res, out = "";
+      var arrow = #/[^-]->|[^=]=>/g, lastIndex = 0, res, out = "";
       
       while (res = arrow.exec(code)) {
         if (right && res.index < right.end) {
@@ -167,7 +167,7 @@ var ExtraCompiler = construct({
         res.data = data;
       }
       else {
-        var opening = /\(|\{|\[/, ending = /\)|\}|\]/, end = /;|,/, br = 0;
+        var opening = #/\(|\{|\[/, ending = #/\)|\}|\]/, end = #/;|,/, br = 0;
         while (true) {
           var ch = code[ind];
           
@@ -186,7 +186,7 @@ var ExtraCompiler = construct({
           ++ind;
         }
         
-        var onlyWhite = /\s/;
+        var onlyWhite = #/\s/;
         while (onlyWhite.test(code[ind])) {
           --ind;
         }
@@ -196,7 +196,7 @@ var ExtraCompiler = construct({
       }
       
       if (defaults) {
-        res.data = res.data.replace(/^\{/, "{ " + defaults);
+        res.data = res.data.replace(#/^\{/, "{ " + defaults);
       }
       
       return res;
@@ -285,7 +285,7 @@ var ExtraCompiler = construct({
     },
     
     compileSharp: code -> {
-      var res, pre = /#((\w|\u0011|\u0012)*)/g;
+      var res, pre = #/#((\w|\$|\u0011|\u0012)*)/g;
       
       while (res = pre.exec(code)) {
         var
@@ -309,7 +309,7 @@ var ExtraCompiler = construct({
             
             var brEnd = @skipWhitespace(code, brInd + 1);
             if (code[brEnd] === ")") {
-              fnCall = fnCall.replace(/,\s*$/, "");
+              fnCall = fnCall.replace(#/,\s*$/, "");
             }
             
             code = code.slice(0, start) + fnCall + code.slice(brInd + 1);
