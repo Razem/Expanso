@@ -34,7 +34,7 @@
     var v = Editor.currentView,
         rgx = /\.js$/, extraRgx = /\.x\.js$/;
     
-    if (rgx.test(v.files[v.file]) || v.lang === 19) {
+    if (rgx.test(v.files[v.file]) || v.lang === 19 || v.lang === 15) {
       // Editor.open("test.js");
       var xhr = new ActiveXObject("MSXML2.XMLHTTP");
       
@@ -119,19 +119,19 @@
   
   var methods = {
     "save": ccMenu.addItem({
-      text: "Ukládat do .min.js souboru",
+      text: "Save to a .min.js file",
       cmd: function () {
         setMethod("save");
       }
     }),
     "save-extra": ccMenu.addItem({
-      text: "Ukládat do .js souboru z .x.js",
+      text: "Save to a .js file from .x.js",
       cmd: function () {
         setMethod("save-extra");
       }
     }),
     "open": ccMenu.addItem({
-      text: "Otevírat v novém souboru",
+      text: "Open in a new file",
       cmd: function () {
         setMethod("open");
       }
