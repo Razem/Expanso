@@ -205,7 +205,7 @@ var ExtraCompiler = construct({
     parseParameters: data -> {
       var
       res = { data: "", defaults: "" },
-      len = data.length, ind = 0, names = [];
+      len = data.length, ind = 0, names = [], values = [];
       
       while (ind < len) {
         ind = @skipWhitespace(data, ind);
@@ -261,7 +261,7 @@ var ExtraCompiler = construct({
           }
           
           val = data.slice(valInd, valEnd);
-          
+          values.push(val);
           res.defaults += "if (" + name + " === undefined) { " + name + " = " + val + "; } ";
           
           ind = valEnd;
@@ -280,6 +280,9 @@ var ExtraCompiler = construct({
       }
       
       res.data = "(" + names.join(", ") + ")";
+      
+      res.names = names;
+      res.values = values;
       
       return res;
     },
@@ -321,9 +324,8 @@ var ExtraCompiler = construct({
         else if (str === "foreach") {
           code = @resolveForeach(code, start, ind);
         }
-        // TODO
         else if (str === "scope") {
-          
+          code = @resolveScope(code, start, ind);
         }
       }
       
@@ -424,6 +426,48 @@ var ExtraCompiler = construct({
                ')' +
                code.slice(end + 1);
       }
+      
+      return code;
+    },
+    
+    resolveScope: (code, start, ind) -> {
+      var parInd = ind = code.indexOf("(", ind), parEnd;
+      
+      var br = 1;
+      while (br > 0) {
+        ++ind;
+        var ch = code[ind];
+        
+        if (ch === "(") {
+          ++br;
+        }
+        else if (ch === ")") {
+          --br;
+        }
+      }
+      
+      parEnd = ind;
+      
+      var scopeData = @parseParameters(code.slice(parInd + 1, parEnd));
+      
+      var bodyInd = ind = code.indexOf("{", ind);
+      
+      br = 1;
+      while (br > 0) {
+        ++ind;
+        var ch = code[ind];
+        
+        if (ch === "{") {
+          ++br;
+        }
+        else if (ch === "}") {
+          --br;
+        }
+      }
+      
+      var body = code.slice(bodyInd, ind + 1);
+      
+      code = code.slice(0, start) + "(function " + scopeData.data + " " + body + ")(" + scopeData.values.join(", ") + ")" + code.slice(ind + 1);
       
       return code;
     }

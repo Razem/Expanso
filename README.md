@@ -58,6 +58,8 @@ var str = `
           <div class="article">
             <div class="author">#{author}</div>
             #{@content}
+            #{@[index]}
+            #{comments.join("<br>")}
           </div>
           `;
 
@@ -100,6 +102,21 @@ var ThisModule = {
 #foreach (key : val of array) {
   // …
 }
+
+// Scoping
+var a = "world", b = "Hello";
+#scope (a = b, b = a) {
+  alert(a + ", " + b + "!"); // Hello, world!
+};
+
+var c = #scope (a = b, b = a) {
+  var exports = {};
+  
+  exports.greeting = a + ", " + b + "!";
+  
+  #export exports;
+};
+alert(c.greeting);
 
 // Support of the "super" keyword using the Legio.construct
 var A = construct({

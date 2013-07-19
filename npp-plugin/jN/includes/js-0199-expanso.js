@@ -37,12 +37,12 @@
   }
   
   var item = {
-    text: "Zkompilovat\tCtrl+F4",
+    text: "Compile\tCtrl+F4",
     cmd: function () {
       var v = Editor.currentView,
           rgx = /\.js$/, extraRgx = /\.x\.js$/;
       
-      if (rgx.test(v.files[v.file]) || v.lang === 19) {
+      if (rgx.test(v.files[v.file]) || v.lang === 19 || v.lang === 15) {
         var code = JSTools.getText(),
             file = v.files[v.file].trim(), saved = false;
         
@@ -91,7 +91,7 @@
   }
   
   var opt = exMenu.addItem({
-    text: "Povolit v Closure Compileru",
+    text: "Allow in Closure Compiler",
     cmd: function () {
       setTurn(!opt.checked);
     }

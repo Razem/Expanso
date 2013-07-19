@@ -200,13 +200,28 @@ var LiteralParser = construct({
       else if (type === "string-expanso") {
         lit = lit.slice(1, -1).replace(cursor, "").replace(#/\\`/g, "`");
         
-        var len = start - code.lastIndexOf("\n", start) - 1, indent = new RegExp("^( ){" + len + "}", "gm");
-        lit = lit.replace(indent, "").trim();
+        var len = start - code.lastIndexOf("\n", start) - 1, indent = new RegExp("\\n( ){" + len + "}", "g");
+        lit = lit.replace(indent, "\n");
+        
+        var first = lit.indexOf("\n"), last = lit.lastIndexOf("\n");
+        if (last === lit.length - 1) {
+          if (lit[last - 1] === "\r") {
+            --last;
+          }
+          
+          lit = lit.slice(0, last);
+        }
+        
+        if (first === 0 || (first === 1 && lit[0] === "\r")) {
+          lit = lit.slice(first + 1);
+        }
         
         lit = JSON.stringify(lit);
         
         var ch = lit[0];
-        lit = lit.replace(#/#\{@((\w|\$)+)\}/g, ch + " + this.$1 + " + ch).replace(#/#\{((\w|\$)+)\}/g, ch + " + $1 + " + ch);
+        lit = lit.replace(#/#\{@(\w|\$)([^\}]+)\}/g, (math, p1, p2) -> ch + " + this." + p1 + p2.replace(#/\\"/g, '"') + " + " + ch)
+                 .replace(#/#\{@([^\}]+)\}/g, (math, p1) -> ch + " + this" + p1.replace(#/\\"/g, '"') + " + " + ch)
+                 .replace(#/#\{([^\}]+)\}/g, (math, p1) -> ch + " + " + p1.replace(#/\\"/g, '"') + " + " + ch);
       }
       
       id = "'" + (@literals.push({ type: type, data: lit }) - 1) + '"';
