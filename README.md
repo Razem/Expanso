@@ -4,7 +4,7 @@ Expanso
 This library allows you to use lambda expressions, precompiler features and lots of other things in JavaScript.
 
 ## Examples
-```
+// ```
 // An immediately returning function
 var a = x -> x * x;
 
