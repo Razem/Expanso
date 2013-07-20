@@ -322,7 +322,7 @@ var ExtraCompiler = construct({
         else if (str === "foreach") {
           code = this.resolveForeach(code, start, ind);
         }
-        else if (str === "scope") {
+        else if (str === "scope" || str === "") {
           code = this.resolveScope(code, start, ind);
         }
       }

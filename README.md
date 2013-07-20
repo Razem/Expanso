@@ -118,6 +118,10 @@ var c = #scope (a = b, b = a) {
 };
 alert(c.greeting);
 
+var d = #(a = b, b = a) { // shorthand
+  // …
+};
+
 // Support of the "super" keyword using the Legio.construct
 var A = construct({
   init: (a, b) -> {
