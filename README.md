@@ -5,11 +5,7 @@ This library allows you to use lambda expressions, precompiler features and lots
 
 ## Examples
 Lambda expressions:
-<<<<<<< HEAD
 ```JavaScript
-=======
-```
->>>>>>> origin/master
 // An immediately returning function
 var a = x -> x * x;
 
@@ -48,7 +44,6 @@ alert(fn()); // "Cute object"
 ```
 
 The "this" shorthand:
-<<<<<<< HEAD
 ```JavaScript
 @someName = "Hello world!"; // means this.someName
 console.log(@); // means this
@@ -63,22 +58,6 @@ var e = (@x, @y) -> {
 
 Multi-line strings and a string interpolation:
 ```JavaScript
-=======
-```
-@someName = "Hello world!"; // means this.someName
-console.log(@); // means this
-
-// "this" parameters
-var e = (@x, @y) -> {
-  @x === x;
-  @y === y;
-  // Both evalute to true
-};
-```
-
-Multi-line strings and a string interpolation:
-```
->>>>>>> origin/master
 // (The indentation - in this case 10 spaces - is cleared on every line)
 var str = `
           <div class="article">
@@ -91,22 +70,14 @@ var str = `
 ```
 
 Better regular expressions (in development):
-<<<<<<< HEAD
 ```JavaScript
-=======
-```
->>>>>>> origin/master
 var rgx = #/some data/g;
 ```
 
 ### Precompiler features
 
 Modules (CommonJS, AMD):
-<<<<<<< HEAD
 ```JavaScript
-=======
-```
->>>>>>> origin/master
 #module (
   SomeModule = "some-module",
   AnotherModule = "another-module"
@@ -128,11 +99,7 @@ var ThisModule = {
 ```
 
 The foreach cycle:
-<<<<<<< HEAD
 ```JavaScript
-=======
-```
->>>>>>> origin/master
 #foreach (key in object) {
   // …
 }
@@ -149,11 +116,7 @@ The foreach cycle:
 ```
 
 Scoping:
-<<<<<<< HEAD
 ```JavaScript
-=======
-```
->>>>>>> origin/master
 var a = "world", b = "Hello";
 #scope (a = b, b = a) {
   alert(a + ", " + b + "!"); // Hello, world!
@@ -174,11 +137,7 @@ var d = #(a = b, b = a) { // shorthand
 ```
 
 Support of the "super" keyword using the Legio.construct:
-<<<<<<< HEAD
 ```JavaScript
-=======
-```
->>>>>>> origin/master
 var A = construct({
   init: (a, b) -> {
     @a = a.toString();
