@@ -4,6 +4,7 @@ Expanso
 This library allows you to use lambda expressions, precompiler features and lots of other things in JavaScript.
 
 ## Examples
+Lambda expressions:
 ```
 // An immediately returning function
 var a = x -> x * x;
@@ -25,17 +26,6 @@ var d = (x, y = 10) -> {
   // …
 };
 
-// The "this" shorthand
-@someName = "Hello world!"; // means this.someName
-console.log(@); // means this
-
-// "this" parameters
-var e = (@x, @y) -> {
-  @x === x;
-  @y === y;
-  // Both evalute to true
-};
-
 // Rest parameters
 var f = (a, b, c...) -> {
   alert(c.length);
@@ -51,8 +41,23 @@ var obj = {
 
 var fn = obj.getFn();
 alert(fn()); // "Cute object"
+```
 
-// Multi-line strings and a string interpolation
+The "this" shorthand:
+```
+@someName = "Hello world!"; // means this.someName
+console.log(@); // means this
+
+// "this" parameters
+var e = (@x, @y) -> {
+  @x === x;
+  @y === y;
+  // Both evalute to true
+};
+```
+
+Multi-line strings and a string interpolation:
+```
 // (The indentation - in this case 10 spaces - is cleared on every line)
 var str = `
           <div class="article">
@@ -62,13 +67,17 @@ var str = `
             #{comments.join("<br>")}
           </div>
           `;
+```
 
-// Better regular expressions (in development)
+Better regular expressions (in development):
+```
 var rgx = #/some data/g;
+```
 
-// *** Precompiler features ***
+### Precompiler features
 
-// Modules (CommonJS, AMD), export
+Modules (CommonJS, AMD):
+```
 #module (
   SomeModule = "some-module",
   AnotherModule = "another-module"
@@ -87,8 +96,10 @@ var ThisModule = {
   SomeModule = "some-module" = GlobalNameOfSomeModule,
   AnotherModule = "another-module" = GlobalNameOfAnotherModule
 )
+```
 
-// The foreach cycle
+The foreach cycle:
+```
 #foreach (key in object) {
   // …
 }
@@ -102,8 +113,10 @@ var ThisModule = {
 #foreach (key : val of array) {
   // …
 }
+```
 
-// Scoping
+Scoping:
+```
 var a = "world", b = "Hello";
 #scope (a = b, b = a) {
   alert(a + ", " + b + "!"); // Hello, world!
@@ -121,8 +134,10 @@ alert(c.greeting);
 var d = #(a = b, b = a) { // shorthand
   // …
 };
+```
 
-// Support of the "super" keyword using the Legio.construct
+Support of the "super" keyword using the Legio.construct:
+```
 var A = construct({
   init: (a, b) -> {
     @a = a.toString();
