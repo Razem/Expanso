@@ -1,0 +1,24 @@
+{
+  "name": "expanso",
+  "version": "0.1.0",
+  "description": "This library allows you to use lambda expressions, precompiler features and lots of other things in JavaScript.",
+  "author": {
+    "name": "Radomír Žemlička",
+    "email": "info@razem.cz",
+    "url": "http://razem.cz"
+  },
+  "licence": "LGPL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RadekCZ/Expanso.git"
+  },
+  "main": "./main",
+  "bin": "./bin/expanso",
+  "dependencies": {
+    "legio": ">=0.1.0"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "readme": "This library allows you to use lambda expressions, precompiler features and lots of other things in JavaScript."
+}
