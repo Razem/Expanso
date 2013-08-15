@@ -186,3 +186,11 @@ require(["expanso/extra-compiler", "legio/request"], function (ExtraCompiler, Re
 });
 </script>
 ```
+
+Or you can use the NPM package:
+```
+npm install -g expanso
+
+expanso test-file.jsx
+expanso test-file.jsx someDir/test-file.js
+```
