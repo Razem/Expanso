@@ -18,7 +18,7 @@ var LiteralParser = construct({
       MAIN:
       while (true) {
         var min = Infinity, ch;
-        for (var i = 0; i < symbols.length; ++i) {
+        #foreach (i of symbols) {
           var j = code.indexOf(symbols[i], ind);
           
           if (j !== -1 && j < min) {
@@ -219,9 +219,10 @@ var LiteralParser = construct({
         lit = JSON.stringify(lit);
         
         var ch = lit[0];
-        lit = lit.replace(#/#\{@(\w|\$)([^\}]+)\}/g, (math, p1, p2) -> ch + " + this." + p1 + p2.replace(#/\\"/g, '"') + " + " + ch)
-                 .replace(#/#\{@([^\}]+)\}/g, (math, p1) -> ch + " + this" + p1.replace(#/\\"/g, '"') + " + " + ch)
-                 .replace(#/#\{([^\}]+)\}/g, (math, p1) -> ch + " + " + p1.replace(#/\\"/g, '"') + " + " + ch);
+        // TODO: double \ (current ver. is buggy)
+        lit = lit.replace(#/#\{@(\w|\$)([^\}]+)\}/g, (match, p1, p2) -> ch + " + this." + p1 + p2.replace(#/\\"/g, '"').replace(#/\\\\/, "\\") + " + " + ch)
+                 .replace(#/#\{@([^\}]+)\}/g, (match, p1) -> ch + " + this" + p1.replace(#/\\"/g, '"').replace(#/\\\\/, "\\") + " + " + ch)
+                 .replace(#/#\{([^\}]+)\}/g, (match, p1) -> ch + " + " + p1.replace(#/\\"/g, '"').replace(#/\\\\/, "\\") + " + " + ch);
       }
       
       id = "'" + (@literals.push({ type: type, data: lit }) - 1) + '"';

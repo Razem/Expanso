@@ -40,7 +40,7 @@
     text: "Compile\tCtrl+F4",
     cmd: function () {
       var v = Editor.currentView,
-          rgx = /\.js$/, extraRgx = /\.x\.js$/;
+          rgx = /\.jsx?$/, extraRgx = /\.jsx$/;
       
       if (rgx.test(v.files[v.file]) || v.lang === 19 || v.lang === 15) {
         var code = JSTools.getText(),

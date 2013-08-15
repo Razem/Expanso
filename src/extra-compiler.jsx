@@ -343,7 +343,7 @@ var ExtraCompiler = construct({
       
       var end = code.indexOf(")", ind), names = [], mods = [], globs = [], cont = code.slice(ind + 1, end).split(",");
       
-      for (var i = 0; i < cont.length; ++i) {
+      #foreach (i of cont) {
         var item = cont[i].split("=");
         if (item.length >= 2) {
           var name = item[0].replace(cursor, "").trim(), mod = item[1].replace(cursor, "").trim();

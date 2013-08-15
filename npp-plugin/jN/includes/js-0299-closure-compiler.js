@@ -32,7 +32,7 @@
   // Own functions for compiling
   function compile(level) {
     var v = Editor.currentView,
-        rgx = /\.js$/, extraRgx = /\.x\.js$/;
+        rgx = /\.jsx?$/, extraRgx = /\.jsx$/;
     
     if (rgx.test(v.files[v.file]) || v.lang === 19 || v.lang === 15) {
       // Editor.open("test.js");
@@ -125,7 +125,7 @@
       }
     }),
     "save-extra": ccMenu.addItem({
-      text: "Save to a .js file from .x.js",
+      text: "Save to a .js file from .jsx",
       cmd: function () {
         setMethod("save-extra");
       }
