@@ -1,12 +1,496 @@
-(function(p,u){function q(p,q,v){var t=/\s|\u0011|\u0012/,l=/\u0011|\u0012/g,r=/^(\w|[\$@\u0011\u0012])$/,n=q({init:function(a){this.originalCode=a;a=this.literalParser=new v(a);a.parse();this.code=a.code},members:{skipWhitespace:function(a,b){for(;t.test(a[b]);)++b;return b},compile:function(){var a=this.code,a=this.compileLambdas(a),a=a.replace(/@(\u0011|\u0012)?(\w|\$)/g,"this.$1$2").replace(/@/g,"this"),a=this.compileSharp(a);return this.literalParser.restore(a)},compileLambdas:function(a){for(var b=
-/[^-]->|[^=]=>/g,e=0,c,d="";c=b.exec(a);)if(!(f&&c.index<f.end)){c=c.index;var g=this.getLeft(a,c),f=this.getRight(a,c+3,g.defaults);f.data=this.compileLambdas(f.data);-1!==a.slice(g.end+1,f.start).indexOf("\u0011")&&(f.data="\u0011"+f.data);-1!==a.slice(g.end+1,f.start).indexOf("\u0012")&&(f.data="\u0012"+f.data);var h="function "+g.name+g.data+" "+f.data;"="===a[c+1]&&(h="("+h+").bind(this)");d+=a.slice(e,g.start)+h;e=f.end+1}return d+=a.slice(e)},getLeft:function(a,b){for(;t.test(a[b])&&(!l.test(a[b])||
-!r.test(a[b-1]));)--b;var e={end:b,name:"",defaults:""};if(")"===a[b]){for(var c=1;0<c;){--b;var d=a[b];")"===d?++c:"("===d&&--c}e.start=b;c=a.slice(b+1,e.end);c=this.parseParameters(c);e.data=c.data;e.defaults=c.defaults;for(c=b;0<=b-1&&r.test(a[b-1]);)--b;c=a.slice(b,c);""!==c.replace(l,"")&&(e.start=b,e.name=c)}else{for(;r.test(a[b]);)--b;++b;e.start=b;c=a.slice(b,e.end+1);c=this.parseParameters(c);e.data=c.data;e.defaults=c.defaults}return e},getRight:function(a,b,e){for(;t.test(a[b])&&(!l.test(a[b])||
-!r.test(a[b+1]));)++b;var c={start:b};if("{"===a[b]){for(var d=1;0<d;){++b;var g=a[b];"{"===g?++d:"}"===g&&--d}c.end=b;a=a.slice(c.start,b+1);c.data=a}else{for(var f=/\(|\{|\[/,h=/\)|\}|\]/,m=/;|,/,d=0;;){g=a[b];if(0===d&&(h.test(g)||m.test(g))){--b;break}f.test(g)?++d:h.test(g)&&--d;++b}for(d=/\s/;d.test(a[b]);)--b;c.end=b;c.data="{ return "+a.slice(c.start,b+1)+"; }"}e&&(c.data=c.data.replace(/^\{/,"{ "+e));return c},parseParameters:function(a){for(var b={data:"",defaults:""},e=a.length,c=0,d=[],
-g=[];c<e;){c=this.skipWhitespace(a,c);if(c>=e)break;l.test(a[c-1])&&--c;for(var f=c,h=c,m="";r.test(a[h])&&!(h>=e);)++h;f=a.slice(f,h);c=f.replace(l,"");if(""===c)break;"@"===c[0]&&(m=c+" = "+c.slice(1)+"; ",f=f.replace("@",""));d.push(f);c=this.skipWhitespace(a,h);if("="===a[c]){for(var h=c=this.skipWhitespace(a,++c),k=0;;){var s=a[c];if(0===k&&(","===s||s===u))break;"("===s?++k:")"===s&&--k;++c}h=a.slice(h,c);g.push(h);b.defaults+="if ("+f+" === undefined) { "+f+" = "+h+"; } "}else"..."===a.substr(c,
-3)&&(d.pop(),b.defaults+="var "+f+" = "+n.restParameters+"(arguments, "+d.length+"); ",c+=2);b.defaults+=m;++c}b.data="("+d.join(", ")+")";b.names=d;b.values=g;return b},compileSharp:function(a){for(var b,e=/#((\w|\$|\u0011|\u0012)*)/g;b=e.exec(a);){var c=b.index,d=b[1].replace(l,"");b=c+b[0].length;if("module"===d)a=this.resolveModule(a,c,b);else if("export"===d)a=a.slice(0,c)+"return"+a.slice(b);else if("super"===d)if("("===a[b])a=a.slice(0,c)+n.superInit+a.slice(b);else if("."===a[b]){d=a.indexOf("(",
-b);b=a.slice(b+1,d);b=n.superCall(b);var g=this.skipWhitespace(a,d+1);")"===a[g]&&(b=b.replace(/,\s*$/,""));a=a.slice(0,c)+b+a.slice(d+1)}else a=a.slice(0,c)+n.superConstructor+a.slice(b);else if("foreach"===d)a=this.resolveForeach(a,c,b);else if("scope"===d||""===d)a=this.resolveScope(a,c,b)}return a},resolveModule:function(a,b,e){var c=e=this.skipWhitespace(a,e);e=a.indexOf("(",e);var c=a.slice(c,e).trim(),d=a.indexOf(")",e),g=[],f=[],h=[];e=a.slice(e+1,d).split(",");for(var m=0;m<e.length;++m){var k=
-e[m].split("=");if(2<=k.length){var n=k[0].replace(l,"").trim(),p=k[1].replace(l,"").trim();2<k.length&&(k=k[2].replace(l,"").trim(),h.push(k));g.push(n);f.push(p)}}return a=a.slice(0,b)+'(function (global, undefined) {\n"use strict";\nfunction definition('+g.join(", ")+") {"+a.slice(d+1)+'}\nif (typeof module === "object" && module.exports) {\nmodule.exports = definition('+(f.length?"require("+f.join("), require(")+")":"")+');\n}\nelse if (typeof define === "function" && define.amd) {\ndefine(['+
-f.join(", ")+"], definition);\n}\n"+(""!==c?"else {\nglobal."+c+" = definition("+(h.length?"global."+h.join(", global."):"")+");\n}\n":"")+"})(this);"},resolveForeach:function(a,b,e){e=a.indexOf("(",e);var c=a.indexOf(")",e),d=a.slice(e+1,c);e="";var g=!1;-1===d.indexOf(" in ")&&-1===d.indexOf(" of ")&&(d=d.replace(l,""));if(-1!==d.indexOf(" in ")){var d=d.split(" in "),f=d[0].split(":"),d=d[1].trim(),h=f[0].trim();1<f.length&&(e=f[1].trim(),g=!0);a=a.slice(0,b)+(g?"var "+e+"; ":"")+"for (var "+h+
-" in "+d+") if ("+(g?e+" = "+d+"["+h+"], ":"")+n.objectOwns+"("+d+", "+h+"))"+a.slice(c+1)}else-1!==d.indexOf(" of ")&&(d=d.split(" of "),f=d[0].split(":"),d=d[1].trim(),h=f[0].trim(),1<f.length&&(e=f[1].trim(),g=!0),a=a.slice(0,b)+"for (var "+h+" = 0"+(g?", "+e+" = "+d+"["+h+"]":"")+"; "+h+" < "+d+".length; ++"+h+(g?", "+e+" = "+d+"["+h+"]":"")+")"+a.slice(c+1));return a},resolveScope:function(a,b,e){for(var c=e=a.indexOf("(",e),d=1;0<d;){++e;var g=a[e];"("===g?++d:")"===g&&--d}for(var c=this.parseParameters(a.slice(c+
-1,e)),f=e=a.indexOf("{",e),d=1;0<d;)++e,g=a[e],"{"===g?++d:"}"===g&&--d;d=a.slice(f,e+1);return a=a.slice(0,b)+"(function "+c.data+" "+d+")("+c.values.join(", ")+")"+a.slice(e+1)}},statics:{superInit:"this.superInit",superCall:function(a){return'this.superCall("'+a+'", '},superConstructor:"this.superConstructor",restParameters:"Array.from",objectOwns:"Object.owns"}});return n}"object"===typeof module&&module.exports?module.exports=q(require("legio/std"),require("legio/oop/construct"),require("./literal-parser")):
-"function"===typeof define&&define.amd?define(["legio/std","legio/oop/construct","./literal-parser"],q):p.ExtraCompiler=q(p.Legio,p.Legio.construct,p.LiteralParser)})(this);
+(function (global, undefined) {
+"use strict";
+function definition(Legio, construct, LiteralParser) {
+
+var whitespace = /\s|\u0011|\u0012/, cursor = /\u0011|\u0012/g, alnum = /^(\w|[\$@\u0011\u0012])$/;
+
+var ExtraCompiler = construct({
+  init: function (code) {
+    this.originalCode = code;
+    
+    var lp = this.literalParser = new LiteralParser(code);
+    lp.parse();
+    
+    this.code = lp.code;
+  },
+  
+  members: {
+    skipWhitespace: function (data, ind) {
+      while (whitespace.test(data[ind])) {
+        ++ind;
+      }
+      
+      return ind;
+    },
+    
+    compile: function () {
+      var code = this.code;
+      
+      code = this.compileLambdas(code);
+      
+      // The "this" shortcut
+      code = code.replace(/@(\u0011|\u0012)?(\w|\$)/g, "this.$1$2").replace(/@/g, "this");
+      
+      // Precompiler expressions
+      code = this.compileSharp(code);
+      
+      // Restore literals
+      var out = this.literalParser.restore(code);
+      
+      return out;
+    },
+    
+    compileLambdas: function (code) {
+      var arrow = /[^-]->|[^=]=>/g, lastIndex = 0, res, out = "";
+      
+      while (res = arrow.exec(code)) {
+        if (right && res.index < right.end) {
+          continue;
+        }
+        
+        var ind = res.index, left = this.getLeft(code, ind), right = this.getRight(code, ind + 3, left.defaults);
+        
+        right.data = this.compileLambdas(right.data);
+        
+        if (code.slice(left.end + 1, right.start).indexOf("\u0011") !== -1) {
+          right.data = "\u0011" + right.data;
+        }
+        if (code.slice(left.end + 1, right.start).indexOf("\u0012") !== -1) {
+          right.data = "\u0012" + right.data;
+        }
+        
+        var exp = "function " + left.name + left.data + " " + right.data;
+        
+        if (code[ind + 1] === "=") {
+          exp = "(" + exp + ").bind(this)";
+        }
+        
+        out += code.slice(lastIndex, left.start) + exp;
+        lastIndex = right.end + 1;
+      }
+      
+      out += code.slice(lastIndex);
+      
+      return out;
+    },
+    
+    getLeft: function (code, ind) {
+      while (whitespace.test(code[ind])) {
+        if (cursor.test(code[ind]) && alnum.test(code[ind - 1])) {
+          break;
+        }
+        --ind;
+      }
+      
+      var res = { end: ind, name: "", defaults: "" };
+      
+      if (code[ind] === ")") {
+        var br = 1;
+        while (br > 0) {
+          --ind;
+          var ch = code[ind];
+          
+          if (ch === ")") {
+            ++br;
+          }
+          else if (ch === "(") {
+            --br;
+          }
+        }
+        
+        res.start = ind;
+        
+        var data = code.slice(ind + 1, res.end), params = this.parseParameters(data);
+        
+        res.data = params.data;
+        res.defaults = params.defaults;
+        
+        var nameEnd = ind;
+        while (ind - 1 >= 0 && alnum.test(code[ind - 1])) {
+          --ind;
+        }
+        
+        var name = code.slice(ind, nameEnd);
+        if (name.replace(cursor, "") !== "") {
+          res.start = ind;
+          res.name = name;
+        }
+      }
+      else {
+        while (alnum.test(code[ind])) {
+          --ind;
+        }
+        
+        ++ind;
+        
+        res.start = ind;
+        
+        var data = code.slice(ind, res.end + 1), params = this.parseParameters(data);
+        
+        res.data = params.data;
+        res.defaults = params.defaults;
+      }
+      
+      return res;
+    },
+    
+    getRight: function (code, ind, defaults) {
+      while (whitespace.test(code[ind])) {
+        if (cursor.test(code[ind]) && alnum.test(code[ind + 1])) {
+          break;
+        }
+        ++ind;
+      }
+      
+      var res = { start: ind };
+      
+      if (code[ind] === "{") {
+        var br = 1;
+        while (br > 0) {
+          ++ind;
+          var ch = code[ind];
+          
+          if (ch === "{") {
+            ++br;
+          }
+          else if (ch === "}") {
+            --br;
+          }
+        }
+        
+        res.end = ind;
+        
+        var data = code.slice(res.start, ind + 1);
+        
+        res.data = data;
+      }
+      else {
+        var opening = /\(|\{|\[/, ending = /\)|\}|\]/, end = /;|,/, br = 0;
+        while (true) {
+          var ch = code[ind];
+          
+          if (br === 0 && (ending.test(ch) || end.test(ch))) {
+            --ind;
+            break;
+          }
+          
+          if (opening.test(ch)) {
+            ++br;
+          }
+          else if (ending.test(ch)) {
+            --br;
+          }
+          
+          ++ind;
+        }
+        
+        var onlyWhite = /\s/;
+        while (onlyWhite.test(code[ind])) {
+          --ind;
+        }
+        
+        res.end = ind;
+        res.data = "{ return " + code.slice(res.start, ind + 1) + "; }";
+      }
+      
+      if (defaults) {
+        res.data = res.data.replace(/^\{/, "{ " + defaults);
+      }
+      
+      return res;
+    },
+    
+    parseParameters: function (data) {
+      var
+      res = { data: "", defaults: "" },
+      len = data.length, ind = 0, names = [], values = [];
+      
+      while (ind < len) {
+        ind = this.skipWhitespace(data, ind);
+        
+        if (ind >= len) { break; }
+        
+        if (cursor.test(data[ind - 1])) {
+          --ind;
+        }
+        
+        var nameInd = ind, nameEnd = ind, name, cleanName, def = "";
+        while (alnum.test(data[nameEnd])) {
+          if (nameEnd >= len) { break; }
+          ++nameEnd;
+        }
+        
+        name = data.slice(nameInd, nameEnd);
+        cleanName = name.replace(cursor, "");
+        
+        if (cleanName === "") { break; }
+        
+        if (cleanName[0] === "@") {
+          def = cleanName + " = " + cleanName.slice(1) + "; ";
+          
+          name = name.replace("@", "");
+        }
+        
+        names.push(name);
+        
+        ind = this.skipWhitespace(data, nameEnd);
+        
+        if (data[ind] === "=") {
+          ind = this.skipWhitespace(data, ++ind);
+          
+          var valInd = ind, valEnd = ind, val;
+          
+          var end, br = 0;
+          while (true) {
+            var ch = data[valEnd];
+            
+            if (br === 0 && (ch === "," || ch === undefined)) {
+              break;
+            }
+            
+            if (ch === "(") {
+              ++br;
+            }
+            else if (ch === ")") {
+              --br;
+            }
+            
+            ++valEnd;
+          }
+          
+          val = data.slice(valInd, valEnd);
+          values.push(val);
+          res.defaults += "if (" + name + " === undefined) { " + name + " = " + val + "; } ";
+          
+          ind = valEnd;
+        }
+        else if (data.substr(ind, 3) === "...") {
+          names.pop();
+          
+          res.defaults += "var " + name + " = " + ExtraCompiler.restParameters + "(arguments, " + names.length + "); ";
+          
+          ind += 2;
+        }
+        
+        res.defaults += def;
+        
+        ++ind;
+      }
+      
+      res.data = "(" + names.join(", ") + ")";
+      
+      res.names = names;
+      res.values = values;
+      
+      return res;
+    },
+    
+    compileSharp: function (code) {
+      var res, pre = /#((\w|\$|\u0011|\u0012)*)/g;
+      
+      while (res = pre.exec(code)) {
+        var
+        start = res.index,
+        str = res[1].replace(cursor, ""),
+        ind = start + res[0].length;
+        
+        if (str === "module") {
+          code = this.resolveModule(code, start, ind);
+        }
+        else if (str === "export") {
+          code = code.slice(0, start) + "return" + code.slice(ind);
+        }
+        // construct extension
+        else if (str === "super") {
+          if (code[ind] === "(") {
+            code = code.slice(0, start) + ExtraCompiler.superInit + code.slice(ind);
+          }
+          else if (code[ind] === ".") {
+            var brInd = code.indexOf("(", ind), name = code.slice(ind + 1, brInd), fnCall = ExtraCompiler.superCall(name);
+            
+            var brEnd = this.skipWhitespace(code, brInd + 1);
+            if (code[brEnd] === ")") {
+              fnCall = fnCall.replace(/,\s*$/, "");
+            }
+            
+            code = code.slice(0, start) + fnCall + code.slice(brInd + 1);
+          }
+          else {
+            code = code.slice(0, start) + ExtraCompiler.superConstructor + code.slice(ind);
+          }
+        }
+        else if (str === "foreach") {
+          code = this.resolveForeach(code, start, ind);
+        }
+        else if (str === "scope" || str === "") {
+          code = this.resolveScope(code, start, ind);
+        }
+      }
+      
+      return code;
+    },
+    
+    resolveModule: function (code, start, ind) {
+      ind = this.skipWhitespace(code, ind);
+      
+      var nameInd = ind, modName;
+      
+      ind = code.indexOf("(", ind);
+      
+      modName = code.slice(nameInd, ind).trim();
+      
+      var end = code.indexOf(")", ind), names = [], mods = [], globs = [], cont = code.slice(ind + 1, end).split(",");
+      
+      for (var i = 0; i < cont.length; ++i) {
+        var item = cont[i].split("=");
+        if (item.length >= 2) {
+          var name = item[0].replace(cursor, "").trim(), mod = item[1].replace(cursor, "").trim();
+          
+          if (item.length > 2) {
+            var glob = item[2].replace(cursor, "").trim();
+            globs.push(glob);
+          }
+          
+          names.push(name);
+          mods.push(mod);
+        }
+      }
+      
+      code = code.slice(0, start) +
+             '(function (global, undefined) {\n' +
+             '"use strict";\n' +
+             'function definition(' + names.join(", ") + ') {' +
+             code.slice(end + 1) +
+             '}\n' +
+             'if (typeof module === "object" && module.exports) {\n' +
+             'module.exports = definition(' +
+             (mods.length ? ('require(' + mods.join('), require(') + ')') : "") +
+             ');\n' +
+             '}\n' +
+             'else if (typeof define === "function" && define.amd) {\n' +
+             'define([' + mods.join(", ") + '], definition);\n' +
+             '}\n' +
+             (modName !== "" ? (
+               'else {\n' +
+               'global.' + modName + ' = definition(' +
+               (globs.length ? ('global.' + globs.join(', global.')) : "") +
+               ');\n' +
+               '}\n'
+             ) : "") +
+             '})(this);';
+      
+      return code;
+    },
+    
+    resolveForeach: function (code, start, ind) {
+      ind = code.indexOf("(", ind);
+      var end = code.indexOf(")", ind), data = code.slice(ind + 1, end), val = "", isVal = false;
+      
+      if (data.indexOf(" in ") === -1 && data.indexOf(" of ") === -1) {
+        data = data.replace(cursor, "");
+      }
+      
+      if (data.indexOf(" in ") !== -1) {
+        data = data.split(" in ");
+        
+        var vars = data[0].split(":"), obj = data[1].trim(), key = vars[0].trim();
+        if (vars.length > 1) {
+          val = vars[1].trim();
+          isVal = true;
+        }
+        
+        code = code.slice(0, start) +
+               (isVal ? 'var ' + val + '; ' : '') +
+               'for (var ' + key + ' in ' + obj + ') if (' +
+               (isVal ? val + ' = ' + obj + '[' + key + '], ' : '') +
+               ExtraCompiler.objectOwns + '(' + obj + ', ' + key +
+               '))' +
+               code.slice(end + 1);
+      }
+      else if (data.indexOf(" of ") !== -1) {
+        data = data.split(" of ");
+        
+        var vars = data[0].split(":"), obj = data[1].trim(), key = vars[0].trim();
+        if (vars.length > 1) {
+          val = vars[1].trim();
+          isVal = true;
+        }
+        
+        code = code.slice(0, start) +
+               'for (var ' + key + ' = 0' +
+               (isVal ? ', ' + val + ' = ' + obj + '[' + key + ']' : '') +
+               '; ' + key + ' < ' + obj + '.length; ++' + key +
+               (isVal ? ', ' + val + ' = ' + obj + '[' + key + ']' : '') +
+               ')' +
+               code.slice(end + 1);
+      }
+      
+      return code;
+    },
+    
+    resolveScope: function (code, start, ind) {
+      var parInd = ind = code.indexOf("(", ind), parEnd;
+      
+      var br = 1;
+      while (br > 0) {
+        ++ind;
+        var ch = code[ind];
+        
+        if (ch === "(") {
+          ++br;
+        }
+        else if (ch === ")") {
+          --br;
+        }
+      }
+      
+      parEnd = ind;
+      
+      var scopeData = this.parseParameters(code.slice(parInd + 1, parEnd));
+      
+      var bodyInd = ind = code.indexOf("{", ind);
+      
+      br = 1;
+      while (br > 0) {
+        ++ind;
+        var ch = code[ind];
+        
+        if (ch === "{") {
+          ++br;
+        }
+        else if (ch === "}") {
+          --br;
+        }
+      }
+      
+      var body = code.slice(bodyInd, ind + 1);
+      
+      code = code.slice(0, start) + "(function " + scopeData.data + " " + body + ")(" + scopeData.values.join(", ") + ")" + code.slice(ind + 1);
+      
+      return code;
+    }
+  },
+  
+  statics: {
+    superInit: "this.superInit",
+    superCall: function (name) { return 'this.superCall("' + name + '", '; },
+    superConstructor: "this.superConstructor",
+    
+    restParameters: "Array.from",
+    
+    objectOwns: "Object.owns"
+  }
+});
+
+return ExtraCompiler;
+}
+if (typeof module === "object" && module.exports) {
+module.exports = definition(require("legio/std"), require("legio/oop/construct"), require("./literal-parser"));
+}
+else if (typeof define === "function" && define.amd) {
+define(["legio/std", "legio/oop/construct", "./literal-parser"], definition);
+}
+else {
+global.ExtraCompiler = definition(global.Legio, global.Legio.construct, global.LiteralParser);
+}
+})(this);
