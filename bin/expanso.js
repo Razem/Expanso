@@ -1,5 +1,5 @@
 var
-ExtraCompiler = require("../extra-compiler"),
+ExtraCompiler = require("../lib/extra-compiler"),
 Path = require("path"),
 FS = require("fs");
 
@@ -27,7 +27,9 @@ try {
   var
   compiler = new ExtraCompiler(code);
   compiledCode = compiler.compile();
+  
   FS.writeFileSync(outFile, compiledCode, "utf8");
+  
   console.log("The file was compiler to " + outFile);
 }
 catch (ex) {

@@ -177,6 +177,8 @@ var B = construct({
 ```
 
 ## Compiling
+You need [Legio](https://github.com/RadekCZ/Legio) installed to use this.
+
 ```HTML
 <script src="http://requirejs.org/docs/release/2.1.6/minified/require.js"></script>
 <script>
