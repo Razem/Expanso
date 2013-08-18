@@ -16,6 +16,10 @@ if (!inFile) {
 
 if (!outFile) {
   outFile = inFile.replace(/\.jsx$/, ".js");
+  
+  if (inFile === outFile) {
+    outFile += ".js";
+  }
 }
 
 inFile = Path.resolve(dir, inFile);
@@ -30,7 +34,7 @@ try {
   
   FS.writeFileSync(outFile, compiledCode, "utf8");
   
-  console.log("The file was compiler to " + outFile);
+  console.log("The file was compiled to " + outFile);
 }
 catch (ex) {
   console.log(ex);
