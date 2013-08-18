@@ -185,14 +185,14 @@ You need [Legio](https://github.com/RadekCZ/Legio) installed to use this.
 require.config({
   baseUrl: "/",
   paths: {
-    "legio": "legio/src",
-    "expanso": "src"
+    "legio": "some/path/to/legio/",
+    "expanso": "some/path/to/expanso/"
   }
 });
 </script>
 
 <script>
-require(["expanso/extra-compiler", "legio/request"], function (ExtraCompiler, Request) {
+require(["expanso/lib/extra-compiler", "legio/util/request"], function (ExtraCompiler, Request) {
   
   Request.file("test-file.js").then(function (code) {
     var compiler = new ExtraCompiler(code);
